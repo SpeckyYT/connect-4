@@ -7,7 +7,7 @@ struct Dimension {
     height: usize,
 }
 
-struct Game {
+struct ConnectFour {
     size: Dimension,
     field: Vec<Vec<usize>>,
     players: usize,
@@ -16,9 +16,11 @@ struct Game {
     colors: Vec<String>,
 }
 
-impl Game {
+impl ConnectFour {
     fn introduction(&self) {
-        println!("hi, here you can gaem :sunglussesswk:");
+        println!("{}", "Welcome to Connect 4!".magenta());
+        println!("{}", "Move the selector around with the Left/Right Arrow Keys.".blue());
+        println!("{}", "Place your token with Up/Down/Enter Keys.".yellow())
     }
     fn reset_field(&mut self) {
         self.field = vec![ vec![ 0; self.size.height ]; self.size.width ];
@@ -65,7 +67,7 @@ impl Game {
                 }
 
                 if previous_selector != self.selector || move_done {
-                    self.clear_terminal();
+                    clear_terminal();
                     self.draw_field();
                     self.draw_selector();
                     self.current_player();
@@ -142,19 +144,27 @@ impl Game {
         }
         println!();
     }
-    fn clear_terminal(&self) {
-        println!("{esc}[2J{esc}[1;1H", esc = 27 as char);
-    }
+}
+
+fn clear_terminal() {
+    println!("{esc}[2J{esc}[1;1H", esc = 27 as char);
+}
+
+fn press_any_key(cont: bool, times: usize) {
+    println!(
+        "Press any key {}to {}...",
+        if times > 0 { times.to_string() + " times " } else { String::new() },
+        if cont { "continue" } else { "exit" },
+    );
+    for _ in 0..times { read().unwrap(); }
 }
 
 fn main() {
-    let field_size = Dimension {
-        width: 7,
-        height: 6,
-    };
-
-    let mut game = Game {
-        size: field_size,
+    let mut game = ConnectFour {
+        size: Dimension {
+            width: 7,
+            height: 6,
+        },
         players: 2,
         current_player: 1,
         field: vec![vec![]],
@@ -172,7 +182,7 @@ fn main() {
 
     game.reset_field();
 
-    game.clear_terminal();
+    clear_terminal();
     game.introduction();
     game.draw_field();
     game.draw_selector();
@@ -183,7 +193,7 @@ fn main() {
         let winner = game.who_won();
         if winner != 0 { break winner; }
         
-        game.clear_terminal();
+        clear_terminal();
         game.draw_field();
         game.draw_selector();
 
@@ -195,7 +205,8 @@ fn main() {
         }
     };
 
-    game.clear_terminal();
+    clear_terminal();
     game.draw_field();
     game.display_winner(winner_player);
+    press_any_key(false, 3);
 }
